@@ -1,268 +1,308 @@
-# AutoEIT Transcription System
+# 🧠 AutoEIT: Learner-Aware Transcription System
 
-## Why this exists
-
-This project started from a very simple observation:
-
-> Transcribing learner speech manually takes too much time.
-
-At first, it sounded like a normal speech-to-text problem.
-But once I looked deeper into the data (non-native speakers doing Elicited Imitation Tasks), I realized something important:
-
-**This is not normal speech.**
-
-The audio contains:
-
-* strong accents
-* mispronunciations
-* incomplete sentences
-* inconsistent pacing
-* sometimes even mixed languages
-
-Most existing ASR systems are trained on clean, native speech.
-So when applied here, they fail in subtle but critical ways.
+### A Multi-Layered, Intelligence-Driven Pipeline for Non-Native Speech
 
 ---
 
-## Initial approach (and why it wasn’t enough)
+## 🚀 Overview
 
-My first instinct was straightforward:
+AutoEIT is a **learner-aware speech transcription and analysis system** designed for processing **non-native speaker audio** from Elicited Imitation Tasks (EIT).
 
-> Use a pretrained model like Whisper and transcribe the audio.
+Unlike traditional ASR systems optimized for clean, native speech, AutoEIT is built to handle:
 
-This worked… but only to an extent.
+* Accents and pronunciation variation
+* Disfluencies and interruptions
+* Code-switched (multilingual) speech
+* Structurally inconsistent learner output
 
-Problems I observed:
-
-* background noise affected output more than expected
-* strong accents caused incorrect word predictions
-* fast speakers merged words into one
-* slow speakers created unnatural pauses
-* learner errors were transcribed literally, even when clearly unintended
-
-At this point, it became clear:
-
-> A single model is not enough.
+Beyond transcription, the system performs **multi-level linguistic analysis** to produce structured, interpretable, and research-ready outputs.
 
 ---
 
-## Key realization
+## 🎯 Core Idea
 
-Instead of treating this as “just ASR”, I reframed the problem as:
-
-> **A pipeline that gradually reduces noise (audio + linguistic) at multiple levels**
-
-This led to the current architecture.
+> Move from *“what was said”* → to → *“how it was said and how reliable it is”*
 
 ---
 
-## System Design
+## ⚙️ System Architecture
 
-The system is built as a multi-stage pipeline:
+### 🧩 Layered Pipeline Design
 
 ```
-Audio → Preprocessing → ASR → Post-processing → Final Transcript
+Audio Input
+   ↓
+Preprocessing Layer
+   ↓
+ASR Layer (Whisper)
+   ↓
+Intelligence Layer (Level 3)
+   ↓
+Refinement Layer (Level 3.5)
+   ↓
+Unified Output Layer
 ```
 
-Each stage exists because of a specific failure I encountered.
+---
+
+## 📁 Project Structure
+
+```
+speech-text/
+├── preprocessing/
+│   ├── audio_normalization.py
+│   ├── noise_reduction.py
+│   └── audio_enhancer.py
+│
+├── models/
+│   └── base_asr/
+│       └── whisper_model.py
+│
+├── analysis/
+│   ├── speech_dynamics.py
+│   ├── language_detection.py
+│   ├── lexical_handler.py
+│   ├── annotation_builder.py
+│   ├── segment_quality.py
+│   ├── phonetic_analyzer.py
+│   ├── disfluency_detector.py
+│   ├── quality_aggregator.py
+│   └── unified_output_builder.py
+│
+├── pipeline/
+│   └── full_pipeline.py
+│
+├── data/
+│   └── sample.wav
+│
+├── main.py
+├── validate_level3.py
+├── validate_level35.py
+├── validate_unified.py
+├── requirements.txt
+└── README.md
+```
 
 ---
 
-## 1. Audio Preprocessing
-
-### Problem
-
-Raw audio is inconsistent:
-
-* background noise
-* varying volume levels
-* long silences
-* overlapping sounds
-
-### Solution
-
-A preprocessing layer that:
-
-* reduces noise
-* normalizes volume
-* segments useful speech
-* optionally augments data (speed/pitch variations)
-
-### Why this matters
-
-Even a strong ASR model performs poorly on low-quality input.
-Cleaning audio gave noticeable improvements before any model changes.
+# 🧠 System Layers Explained
 
 ---
 
-## 2. Base ASR Model
+## 🔊 1. Preprocessing Layer
 
-### Problem
+Handles real-world audio imperfections:
 
-Building a model from scratch is unrealistic and unnecessary.
+* Noise reduction (spectral gating)
+* Volume normalization
+* Audio validation and cleanup
+* Robust handling of corrupted/silent inputs
 
-### Solution
+---
 
-Use pretrained models like:
+## 📝 2. ASR Layer
 
+* Whisper-based transcription
+* Handles non-native speech variability
+* Fallback-safe and validated outputs
+
+---
+
+## 🧠 3. Intelligence Layer (Level 3)
+
+Adds linguistic awareness:
+
+### 🎤 Speech Dynamics
+
+* Duration, speech rate, pause detection
+
+### 🌍 Language Detection
+
+* Word-level multilingual identification
+* Code-switch handling
+
+### 🧩 Lexical Handling
+
+* Slang detection
+* Merged words
+* Unknown token classification
+
+### 🧾 Structured Annotation
+
+* Word-level metadata
+* Confidence scoring
+* Research-ready JSON output
+
+---
+
+## 🚀 4. Refinement Layer (Level 3.5)
+
+Adds deeper speech understanding:
+
+---
+
+### 🟩 Segment Quality Analysis
+
+* Splits speech into segments
+* Labels each as HIGH / MEDIUM / LOW
+* Uses:
+
+  * unknown word ratio
+  * disfluency presence
+  * language consistency
+
+---
+
+### 🔊 Phonetic Error Awareness
+
+* Detects pronunciation-based variations
+* Uses edit distance + phonetic heuristics
+* Example:
+
+  * *“bery” → “very”*
+* Annotates errors without correction
+
+---
+
+### 🗣️ Disfluency Detection
+
+* Identifies:
+
+  * fillers (“uh”, “um”)
+  * repetitions
+  * restarts and corrections
+* Tracks positions and patterns
+
+---
+
+## 🧩 5. Unified Output Layer (KEY FEATURE)
+
+This is what makes the system feel *complete*.
+
+### 🔥 Quality Aggregator
+
+Combines:
+
+* segment quality
+* phonetic errors
+* disfluencies
+
+→ produces:
+
+* overall quality score
+* detected issues
+* critical regions
+
+---
+
+### 📊 Unified Output Builder
+
+Outputs a **single coherent structure**:
+
+```json
+{
+  "transcription": "...",
+  "speech_analysis": {...},
+  "linguistic_analysis": {...},
+  "quality_summary": {
+    "overall_quality": "medium",
+    "critical_regions": [...],
+    "issues_detected": [...]
+  }
+}
+```
+
+---
+
+# 🎯 Key Contributions
+
+* ✅ Learner-aware transcription pipeline
+* ✅ Multi-level linguistic analysis (word, segment, phonetic, fluency)
+* ✅ Code-switch and multilingual handling
+* ✅ Segment-level quality assessment
+* ✅ Phonetic error detection without correction
+* ✅ Disfluency-aware speech modeling
+* ✅ Unified reliability-aware output
+* ✅ Fully robust, fault-tolerant system
+
+---
+
+# 🧠 Design Philosophy
+
+1. **Preserve learner behavior**
+   → No forced correction
+
+2. **Model speech, not just text**
+   → Capture production patterns
+
+3. **Enable evaluation readiness**
+   → Structured and interpretable outputs
+
+---
+
+# 🔮 Applications
+
+* EIT transcription pipelines
+* Language learning research
+* Fluency and pronunciation analysis
+* Code-switching studies
+* Curriculum and assessment design
+* Preprocessing for automated scoring systems
+
+---
+
+# 🛠️ Tech Stack
+
+* Python
+* PyTorch
 * Whisper
-* Wav2Vec2
-
-These provide a strong starting point.
-
----
-
-## 3. Fine-tuning for Learner Speech
-
-### Problem
-
-Pretrained models assume:
-
-* correct pronunciation
-* fluent sentence structure
-
-Learner speech violates both.
-
-### Solution
-
-Fine-tune the ASR model on:
-
-* non-native speech data
-* varied accents
-* imperfect sentence constructions
-
-### Insight
-
-Instead of explicitly handling accents, the model learns patterns from exposure.
+* Librosa
+* NumPy
 
 ---
 
-## 4. Handling Variability in Speech
+# ▶️ Usage
 
-### Observations
-
-* Some speakers talk extremely fast → words merge
-* Some speak slowly → unnatural segmentation
-* Some invent or distort words
-
-### Approach
-
-Rather than hardcoding rules:
-
-* rely on model robustness
-* support it through augmentation during training
+```bash
+pip install -r requirements.txt
+python main.py
+```
 
 ---
 
-## 5. Multilingual and Mixed Language Handling
+# 🛡️ Robustness & Validation
 
-### Problem
+Validation scripts:
 
-Learners sometimes mix languages:
+* `validate_level3.py`
+* `validate_level35.py`
+* `validate_unified.py`
 
-* insert native words
-* partially translate sentences
+System handles:
 
-### Solution
+* missing files
+* corrupted audio
+* silent inputs
+* invalid data
+* model failures
 
-* use multilingual ASR models
-* apply post-processing where needed
-
-This is not fully solved yet, but the system is designed to support it.
-
----
-
-## 6. Post-processing Layer (Critical Component)
-
-### Problem
-
-Even after ASR, outputs are not reliable enough:
-
-* grammatical inconsistencies
-* predictable learner mistakes
-* partially correct sentences
-
-### Solution
-
-A post-processing pipeline that:
-
-* cleans text
-* applies grammar correction
-* fixes common transcription errors
-
-### Key Insight
-
-This stage often improves results more than model tuning alone.
+👉 Always fails gracefully
 
 ---
 
-## 7. Evaluation
+# 📈 Future Work
 
-### Goal
-
-Reach transcription quality close to human annotators.
-
-### Metrics used:
-
-* Word Error Rate (WER)
-* Character Error Rate (CER)
-
-### Target
-
-~90% agreement with human transcription
+* ASR fine-tuning on learner datasets
+* Integration with automated scoring systems
+* Real-time streaming support
+* Expanded multilingual capabilities
 
 ---
 
-## Project Structure Philosophy
+# 🎯 Final Statement
 
-This project is intentionally modular.
+AutoEIT is not just a transcription system.
 
-Each component (preprocessing, model, post-processing) is isolated so that:
+It is a **multi-layered, learner-aware linguistic analysis pipeline** that transforms raw speech into structured, reliable, and evaluation-ready data.
 
-* improvements can be made independently
-* experiments can be run easily
-* components can be swapped without breaking the system
 
----
-
-## What this project is really about
-
-At a surface level:
-
-> Converting audio to text.
-
-At a deeper level:
-
-> Making AI handle imperfect, real-world human input.
-
----
-
-## Current State
-
-* Basic pipeline structure implemented
-* Preprocessing modules in place
-* ASR baseline integrated
-* Post-processing under active development
-
----
-
-## Future Work
-
-* better fine-tuning with learner-specific datasets
-* stronger post-processing models
-* improved multilingual handling
-* benchmarking across different proficiency levels
-
----
-
-## Final Thought
-
-This project evolved from a simple idea into a layered system because:
-
-> Real-world data is messy, and simple solutions don’t hold up.
-
-Instead of forcing a single model to solve everything,
-this approach distributes the problem across multiple stages —
-each designed to handle a specific type of imperfection.
-
----
