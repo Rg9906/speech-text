@@ -13,6 +13,11 @@ from analysis.speech_dynamics import SpeechDynamicsAnalyzer
 from analysis.language_detection import LanguageDetector
 from analysis.lexical_handler import LexicalHandler
 from analysis.annotation_builder import AnnotationBuilder
+from analysis.segment_quality import SegmentQualityAnalyzer
+from analysis.phonetic_analyzer import PhoneticAnalyzer
+from analysis.disfluency_detector import DisfluencyDetector
+from analysis.quality_aggregator import QualityAggregator
+from analysis.unified_output_builder import UnifiedOutputBuilder
 
 class TranscriptionPipeline:
     def __init__(self, audio_path):
@@ -31,6 +36,15 @@ class TranscriptionPipeline:
         self.language_detector = LanguageDetector()
         self.lexical_handler = LexicalHandler()
         self.annotation_builder = AnnotationBuilder()
+        
+        # Level 3.5: Intelligence refinement modules
+        self.segment_analyzer = SegmentQualityAnalyzer()
+        self.phonetic_analyzer = PhoneticAnalyzer()
+        self.disfluency_detector = DisfluencyDetector()
+        
+        # Level 3.5+: Quality aggregation and unified output
+        self.quality_aggregator = QualityAggregator()
+        self.unified_output_builder = UnifiedOutputBuilder()
         
         self.temp_file = "temp_processed.wav"
     
@@ -139,10 +153,38 @@ class TranscriptionPipeline:
             print("  - Classifying words...")
             lexical_classification = self.lexical_handler.classify_words(language_tags)
             
-            # 6d: Build annotated output
-            print("  - Building annotated output...")
-            annotated_output = self.annotation_builder.build_annotated_output(
-                transcription, speech_analysis, language_tags, lexical_classification
+            # Step 6.5: Level 3.5 Intelligence Refinement
+            print("Step 6.5: Running intelligence refinement...")
+            
+            # 6.5a: Segment quality analysis
+            print("  - Analyzing segment quality...")
+            segment_analysis = self.segment_analyzer.analyze_segments(
+                transcription, language_tags, lexical_classification
+            )
+            
+            # 6.5b: Phonetic error awareness
+            print("  - Detecting phonetic errors...")
+            phonetic_analysis = self.phonetic_analyzer.analyze_phonetic_errors(
+                lexical_classification
+            )
+            
+            # 6.5c: Disfluency detection
+            print("  - Detecting disfluencies...")
+            disfluency_analysis = self.disfluency_detector.detect_disfluencies(
+                transcription
+            )
+            
+            # Step 6.6: Quality Aggregation
+            print("Step 6.6: Aggregating quality metrics...")
+            quality_summary = self.quality_aggregator.aggregate_quality(
+                segment_analysis, phonetic_analysis, disfluency_analysis, transcription
+            )
+            
+            # Step 6.7: Unified Output Building
+            print("Step 6.7: Building unified output...")
+            unified_output = self.unified_output_builder.build_unified_output(
+                transcription, speech_analysis, lexical_classification,
+                segment_analysis, phonetic_analysis, disfluency_analysis, quality_summary
             )
             
             # Step 7: Complete
@@ -151,7 +193,7 @@ class TranscriptionPipeline:
             # Clean up temp file
             self._cleanup_temp_file()
             
-            return annotated_output
+            return unified_output
             
         except Exception as e:
             print(f"Error during transcription: {e}")
