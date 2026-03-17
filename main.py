@@ -1,6 +1,7 @@
 import sys
 import os
 import time
+import json
 sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from pipeline.full_pipeline import TranscriptionPipeline
@@ -11,9 +12,10 @@ def main():
         # Define audio path
         audio_path = "data/sample.wav"
         
-        print("=" * 50)
-        print("AutoEIT Transcription System - Level 2")
-        print("=" * 50)
+        print("=" * 60)
+        print("AutoEIT Transcription System - Level 3")
+        print("Intelligence + Differentiation Layer")
+        print("=" * 60)
         print(f"Target audio file: {audio_path}")
         print()
         
@@ -25,7 +27,7 @@ def main():
         # Check if file exists
         if not os.path.exists(audio_path):
             print(f"Error: Audio file not found: {audio_path}")
-            print("Please ensure the audio file exists at the specified path.")
+            print("Please ensure that audio file exists at the specified path.")
             return
         
         # Get file info
@@ -35,7 +37,7 @@ def main():
         except Exception as size_error:
             print(f"Warning: Could not get file size: {size_error}")
         
-        print("Starting transcription pipeline...")
+        print("Starting intelligence-enhanced transcription pipeline...")
         print()
         
         # Initialize pipeline
@@ -47,7 +49,7 @@ def main():
         
         # Run pipeline with timing
         start_time = time.time()
-        transcription = pipeline.run()
+        result = pipeline.run()
         end_time = time.time()
         
         # Calculate duration
@@ -56,29 +58,84 @@ def main():
         print()
         
         # Display results
-        print("=" * 50)
-        print("RESULTS")
-        print("=" * 50)
+        print("=" * 60)
+        print("INTELLIGENCE-ENHANCED RESULTS")
+        print("=" * 60)
         
-        if transcription is None:
+        if result is None:
             print("Status: FAILED")
-            print("Transcription failed.")
+            print("Transcription and analysis failed.")
             print("Please check the error messages above.")
-        elif transcription == "":
-            print("Status: EMPTY RESULT")
-            print("Transcription completed but returned empty text.")
-            print("This might indicate:")
-            print("- Silent audio file")
-            print("- Unrecognizable speech")
-            print("- Audio processing issues")
-        else:
-            print("Status: SUCCESS")
-            print(f"Transcription: {transcription}")
-            print(f"Character count: {len(transcription)}")
-            print(f"Word count: {len(transcription.split())}")
         
-        print("=" * 50)
-        print("Process complete.")
+        elif isinstance(result, dict):
+            # Level 3: Structured annotated output
+            print("Status: SUCCESS")
+            print()
+            
+            # Display transcription
+            transcription = result.get("transcription", "")
+            print(f"📝 Transcription: {transcription}")
+            print()
+            
+            # Display speech analysis
+            speech_analysis = result.get("speech_analysis", {})
+            if speech_analysis:
+                print("🎤 Speech Dynamics:")
+                print(f"  Duration: {speech_analysis.get('duration', 0):.2f} seconds")
+                print(f"  Speech Rate: {speech_analysis.get('speech_rate', 'unknown')}")
+                print(f"  Pauses Detected: {speech_analysis.get('pauses_detected', 0)}")
+                print()
+            
+            # Display word analysis
+            word_analysis = result.get("word_analysis", [])
+            if word_analysis:
+                print("🔤 Word-Level Analysis:")
+                for word_info in word_analysis[:10]:  # Show first 10 words
+                    word = word_info.get("word", "")
+                    lang = word_info.get("language", "unknown")
+                    wtype = word_info.get("type", "unknown")
+                    confidence = word_info.get("confidence", 0)
+                    print(f"  '{word}' | Lang: {lang} | Type: {wtype} | Conf: {confidence:.2f}")
+                
+                if len(word_analysis) > 10:
+                    print(f"  ... and {len(word_analysis) - 10} more words")
+                print()
+            
+            # Display metadata
+            metadata = result.get("metadata", {})
+            if metadata:
+                print("📊 Metadata Summary:")
+                print(f"  Total Words: {metadata.get('total_words', 0)}")
+                print(f"  Unique Words: {metadata.get('unique_words', 0)}")
+                
+                languages = metadata.get("languages_detected", {})
+                if languages:
+                    print("  Languages Detected:")
+                    for lang, count in languages.items():
+                        print(f"    {lang}: {count}")
+                
+                word_types = metadata.get("word_type_distribution", {})
+                if word_types:
+                    print("  Word Types:")
+                    for wtype, count in word_types.items():
+                        print(f"    {wtype}: {count}")
+                
+                timestamp = metadata.get("processing_timestamp", "unknown")
+                print(f"  Processed: {timestamp}")
+                print()
+            
+            # Option to save full results
+            print("💾 Full structured output available.")
+            print("   Use json.dumps(result, indent=2) to export.")
+        
+        else:
+            # Fallback for unexpected result types
+            print("Status: UNEXPECTED RESULT")
+            print(f"Result type: {type(result)}")
+            print(f"Result: {result}")
+        
+        print("=" * 60)
+        print("Intelligence analysis complete.")
         
     except KeyboardInterrupt:
         print("\nProcess interrupted by user.")

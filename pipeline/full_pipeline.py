@@ -2,13 +2,17 @@ import sys
 import os
 import soundfile as sf
 import numpy as np
+import json
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
 
 from preprocessing.audio_normalization import AudioLoader
 from preprocessing.noise_reduction import NoiseReducer
 from preprocessing.audio_enhancer import AudioEnhancer
 from models.base_asr.whisper_model import WhisperModel
-
+from analysis.speech_dynamics import SpeechDynamicsAnalyzer
+from analysis.language_detection import LanguageDetector
+from analysis.lexical_handler import LexicalHandler
+from analysis.annotation_builder import AnnotationBuilder
 
 class TranscriptionPipeline:
     def __init__(self, audio_path):
@@ -21,6 +25,13 @@ class TranscriptionPipeline:
         self.noise_reducer = NoiseReducer()
         self.enhancer = AudioEnhancer()
         self.whisper_model = WhisperModel()
+        
+        # Level 3: Intelligence modules
+        self.speech_analyzer = SpeechDynamicsAnalyzer()
+        self.language_detector = LanguageDetector()
+        self.lexical_handler = LexicalHandler()
+        self.annotation_builder = AnnotationBuilder()
+        
         self.temp_file = "temp_processed.wav"
     
     def _cleanup_temp_file(self):
@@ -48,6 +59,9 @@ class TranscriptionPipeline:
             if audio is None or sr is None:
                 print("Error: Failed to load audio")
                 return None
+            
+            # Store original audio for speech analysis
+            original_audio = audio.copy()
             
             # Validate audio data
             if len(audio) == 0:
@@ -110,13 +124,34 @@ class TranscriptionPipeline:
                 print(f"Error: Whisper transcription failed: {whisper_error}")
                 return None
             
-            # Step 6: Complete
-            print("Step 6: Transcription complete.")
+            # Step 6: Level 3 Intelligence Analysis
+            print("Step 6: Running intelligence analysis...")
+            
+            # 6a: Speech dynamics analysis
+            print("  - Analyzing speech dynamics...")
+            speech_analysis = self.speech_analyzer.analyze_speech(original_audio, sr, transcription)
+            
+            # 6b: Language detection
+            print("  - Detecting languages...")
+            language_tags = self.language_detector.detect_languages(transcription)
+            
+            # 6c: Lexical classification
+            print("  - Classifying words...")
+            lexical_classification = self.lexical_handler.classify_words(language_tags)
+            
+            # 6d: Build annotated output
+            print("  - Building annotated output...")
+            annotated_output = self.annotation_builder.build_annotated_output(
+                transcription, speech_analysis, language_tags, lexical_classification
+            )
+            
+            # Step 7: Complete
+            print("Step 7: Intelligence analysis complete.")
             
             # Clean up temp file
             self._cleanup_temp_file()
             
-            return transcription
+            return annotated_output
             
         except Exception as e:
             print(f"Error during transcription: {e}")
